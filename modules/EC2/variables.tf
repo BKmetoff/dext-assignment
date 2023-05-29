@@ -30,3 +30,8 @@ variable "region" {
   description = "The AWS region"
   type        = string
 }
+
+variable "ec2_public_key" {
+  description = "The name of the ec2 key-pair used to shh into ec2 instances"
+  type        = string
+}
