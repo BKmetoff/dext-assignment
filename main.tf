@@ -8,7 +8,8 @@ locals {
 
   ec2 = {
     instance_type = "t2.micro"
-    ami           = "ami-04f7efe62f419d9f5"
+    ami           = "ami-04f7efe62f419d9f5" # aws linux
+    # ami = "ami-013d87f7217614e10" # CENTos
   }
 }
 
@@ -37,7 +38,7 @@ provider "aws" {
 module "vpc" {
   source = "./modules/VPC"
 
-  name       = "${local.region}-${local.project_name}"
+  name       = local.project_name
   aws_region = local.region
 
   ec2_web_server_count = local.web_server_count
@@ -52,10 +53,10 @@ module "ec2_web_server" {
   region = local.region
   name   = local.project_name
 
-  private   = false
-  subnet_id = element(module.vpc.public_subnet_ids[*].id, count.index)
-
+  private            = false
+  subnet_id          = element(module.vpc.public_subnet_ids[*].id, count.index)
   security_group_ids = [module.vpc.security_group_id]
+  ec2_public_key     = module.vpc.public_key_name
 
   instance_spec = {
     type = local.ec2.instance_type
