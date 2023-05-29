@@ -49,4 +49,10 @@ resource "aws_security_group" "sg" {
       self             = false
     }
   ]
+
+  tags = {
+    "Name"     = "sg-group-${var.name}"
+    "Inbound"  = "HTTP, HTTPS, SSH"
+    "Outbound" = "All"
+  }
 }
