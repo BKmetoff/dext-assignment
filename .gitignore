@@ -1,0 +1,20 @@
+.env.local
+
+# Local .terraform directories
+**/.terraform/*
+**/.terraform.lock.hcl
+.terraform
+workspace
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Plan files
+*.out
+
+# Crash log files
+crash.log
+
+# Ignore IDE files
+.vs-code
