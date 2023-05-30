@@ -66,6 +66,18 @@ module "ec2_web_server" {
   depends_on = [module.vpc]
 }
 
+# export public IPs of web server instances.
+# needed for Ansinble playbook.
+resource "local_file" "ec2_web_server_public_ips" {
+  filename = "${path.root}/ec2_web_server_public_ips.yaml"
+  content = yamlencode({
+    "PublicIPs" : flatten(module.ec2_web_server[*].public_ips)
+  })
+
+  depends_on = [module.ec2_web_server]
+}
+
+
 # module "ec2_database" {
 #   source = "./modules/EC2"
 
