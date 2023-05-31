@@ -8,8 +8,8 @@ locals {
 
   ec2 = {
     instance_type = "t2.micro"
-    ami           = "ami-04f7efe62f419d9f5" # aws linux
-    # ami = "ami-013d87f7217614e10" # CENTos
+    # ami           = "ami-04f7efe62f419d9f5" # aws linux
+    ami = "ami-013d87f7217614e10" # CENTos
   }
 }
 
@@ -66,13 +66,26 @@ module "ec2_web_server" {
   depends_on = [module.vpc]
 }
 
-# export public IPs of web server instances.
-# needed for Ansinble playbook.
-resource "local_file" "ec2_web_server_public_ips" {
-  filename = "${path.root}/ec2_web_server_public_ips.yaml"
-  content = yamlencode({
-    "PublicIPs" : flatten(module.ec2_web_server[*].public_ips)
-  })
+# Export public IPs of EC2 instances.
+# Needed for Ansible playbook.
+resource "local_file" "ec2_public_ips" {
+  # file structure
+  # [webserver]
+  # ip.address.of.instance
+  # ip.address.of.instance
+
+  # [database]
+  # ip.address.of.instance
+
+  filename = "${path.root}/ansible/hosts"
+  content  = <<-EOF
+[webserver]
+%{for ec2 in module.ec2_web_server[*]~}
+${ec2.public_ips[0]}
+%{endfor~}
+
+[database]
+EOF
 
   depends_on = [module.ec2_web_server]
 }
