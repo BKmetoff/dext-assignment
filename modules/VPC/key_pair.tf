@@ -1,16 +1,15 @@
-# Inject public_key using a pre-existing
-# .pem file stored locally
+# Inject local ssh key into the EC2 machines
+# to allow Ansible to do its magic.
 
-# The name of the .pem file **must** be
-# the same as the value of 'var.name',
-# which is supplied in the 'locals' block in /main.tf
+# Use 'ssh-keygen' to create an ssh key,
+# name it `id_rsa`,
+# store it in `/ssh`s
 
 data "external" "env" {
   program = [
     "/bin/bash",
-    "${path.module}/external/public_key.sh",
-    var.name,
-    path.module
+    "${path.module}/external/ssh_key.sh",
+    "${path.root}/ssh/id_rsa.pub"
   ]
 }
 

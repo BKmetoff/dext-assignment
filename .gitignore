@@ -17,9 +17,10 @@ crash.log
 # Ignore IDE files
 .vs-code
 
-# Ignore *.pem files
-pem
+# Ignore ssh keys
+id_rsa*
 
 # Misc
 .env.local
 ec2_web_server_public_ips.yaml
+.DS_Store
