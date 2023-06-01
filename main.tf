@@ -7,9 +7,12 @@ locals {
   db_count         = 1
 
   ec2 = {
+    # Amazon Linux 2
+    # Kernel 5.10 AMI 2.0.20230515.0
+    #x86_64 HVM gp2
+    ami           = "ami-0e23c576dacf2e3df"
     instance_type = "t2.micro"
-    # ami           = "ami-04f7efe62f419d9f5" # aws linux
-    ami = "ami-013d87f7217614e10" # CENTos
+    # ami = "ami-013d87f7217614e10" # CENTos
   }
 }
 
@@ -77,7 +80,7 @@ resource "local_file" "ec2_public_ips" {
   # [database]
   # ip.address.of.instance
 
-  filename = "${path.root}/ansible/hosts"
+  filename = "${path.root}/ansible/hosts.ini"
   content  = <<-EOF
 [webserver]
 %{for ec2 in module.ec2_web_server[*]~}
@@ -93,14 +96,22 @@ EOF
 
 # module "ec2_database" {
 #   source = "./modules/EC2"
+#   count  = local.db_count
 
-#   private             = true
-#   number_of_instances = 1
-#   instance_type       = local.ec2.instance_type
-#   ami                 = local.ec2.ami
-#   subnet_id           = module.vpc.private_subnet_id
-#   region              = local.region
-#   name                = local.project_name
+#   region = local.region
+#   name   = local.project_name
+
+#   private = true
+
+#   subnet_id          = ""
+#   security_group_ids = [""]
+
+#   ec2_public_key = module.vpc.public_key_name
+
+#   instance_spec = {
+#     type = local.ec2.instance_type
+#     ami  = local.ec2.ami
+#   }
 
 #   depends_on = [module.vpc]
 # }
