@@ -62,14 +62,39 @@
           - boto3
           - docker-compose
 
-    # - name: register status of /usr/bin/docker-compose
-    #   stat:
-    #     path: /usr/bin/docker-compose
-    #   register: docker_compose_path
+    - name: register status of /usr/bin/docker-compose
+      stat:
+        path: /usr/bin/docker-compose
+      register: docker_compose_path
 
-    # - name: Check if 'docker-compose' is added to PATH
-    #   when: "not docker_compose_path.stat.exists"
-    #   block:
-    #     - name: Add 'docker-compose' to PATH
-    #       become: true
-    #       ansible.builtin.shell: sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+    - name: Check if 'docker-compose' is added to PATH
+      when: "not docker_compose_path.stat.exists"
+      block:
+        - name: Add 'docker-compose' to PATH
+          become: true
+          ansible.builtin.shell: sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+    - name: Copy docker-compose file with owner and permissions
+      become: true
+      ansible.builtin.copy:
+        src: ./docker-compose.yaml # use env var
+        dest: /home/ec2-user/docker-compose.yaml
+        owner: ec2-user # use env var
+        group: ec2-user # use env var
+        mode: "0644"
+
+    - name: Standup server and db services
+      become: true
+      shell: "docker-compose up -d"
+
+    - name: Copy seed.sql
+      become: true
+      ansible.builtin.copy:
+        src: ./seed.sql # use env var
+        dest: /home/ec2-user/seed.sql
+        owner: ec2-user # use env var
+        group: ec2-user # use env var
+        mode: "0644"
+
+    - name: Grep db container id
+      shell: "docker-compose up -d"
