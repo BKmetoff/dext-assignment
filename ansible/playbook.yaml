@@ -4,7 +4,7 @@
 # Ansible playbook AWS - install docker (2021)
 ---
 - name: "AWS - Install docker and start docker services"
-  hosts: webserver
+  hosts: all
   become: true
   tasks:
     - name: Update all packages
@@ -31,11 +31,6 @@
 
     - name: Enable Some packages from amazon-linux-extras packages
       shell: "amazon-linux-extras enable python3.8 ansible2 docker"
-
-    # - name: clean yum metadata cache
-    #   command: yum clean metadata
-    #   args:
-    #     warn: false
 
     - name: Ensure a list of yum packages are installed
       yum:
@@ -67,27 +62,14 @@
           - boto3
           - docker-compose
 
-    - name: register status of /usr/bin/docker-compose
-      stat:
-        path: /usr/bin/docker-compose
-      register: docker_compose_path
+    # - name: register status of /usr/bin/docker-compose
+    #   stat:
+    #     path: /usr/bin/docker-compose
+    #   register: docker_compose_path
 
-    - name: Check if 'docker-compose' is added to PATH
-      when: "not docker_compose_path.stat.exists"
-      block:
-        - name: Add 'docker-compose' to PATH
-          become: true
-          ansible.builtin.shell: sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-
-    - name: Copy docker-compose file with owner and permissions
-      become: true
-      ansible.builtin.copy:
-        src: ../docker/docker-compose.yaml # use env var
-        dest: /home/ec2-user/docker-compose.yaml
-        owner: ec2-user # use env var
-        group: ec2-user # use env var
-        mode: "0644"
-
-    - name: Start docker services
-      become: true
-      ansible.builtin.shell: sudo docker-compose up -d
+    # - name: Check if 'docker-compose' is added to PATH
+    #   when: "not docker_compose_path.stat.exists"
+    #   block:
+    #     - name: Add 'docker-compose' to PATH
+    #       become: true
+    #       ansible.builtin.shell: sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose

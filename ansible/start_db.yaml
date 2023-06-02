@@ -1,0 +1,17 @@
+---
+- name: "Start MySQL"
+  hosts: database
+  become: true
+  tasks:
+    - name: Start My SQL docker container
+      become: true
+      ansible.builtin.shell: docker run --env MARIADB_USER=example-user --env MARIADB_PASSWORD=my_cool_secret --env MARIADB_ROOT_PASSWORD=my-secret-pw --name maria-db -v /data/:/var/lib/mysql -d mariadb:latest
+
+    # - name: Copy docker-compose file with owner and permissions
+    #   become: true
+    #   ansible.builtin.copy:
+    #     src: ../docker/docker-compose-wordpress.yaml # use env var
+    #     dest: /home/ec2-user/docker-compose.yaml
+    #     owner: ec2-user # use env var
+    #     group: ec2-user # use env var
+    #     mode: "0644"
