@@ -7,24 +7,20 @@ resource "aws_instance" "ec2" {
   key_name = var.ec2_public_key
 
   tags = {
-    Name   = var.private ? "${var.name}-db" : "${var.name}-server"
+    Name   = "${var.name}-server"
     Region = var.region
   }
 }
 
 resource "aws_eip" "eip" {
-  count = length(aws_instance.ec2[*].id)
-
-  instance         = element(aws_instance.ec2[*].id, count.index)
+  instance         = aws_instance.ec2.id
   public_ipv4_pool = "amazon"
   vpc              = true
 
-  tags = { "Name" = "elastic-ip-${count.index}-${var.name}" }
+  tags = { "Name" = "elastic-ip-${var.name}" }
 }
 
 resource "aws_eip_association" "eip_association" {
-  count = length(aws_eip.eip)
-
-  instance_id   = element(aws_instance.ec2[*].id, count.index)
-  allocation_id = element(aws_eip.eip[*].id, count.index)
+  instance_id   = aws_instance.ec2.id
+  allocation_id = aws_eip.eip.id
 }

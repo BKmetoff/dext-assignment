@@ -1,8 +1,3 @@
-variable "private" {
-  description = "Whether an EC2 instance should be exposed to the outside world"
-  type        = bool
-}
-
 variable "instance_spec" {
   description = "The type of machines to launch"
   type = object({
