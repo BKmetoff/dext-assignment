@@ -44,22 +44,27 @@ module "vpc" {
   name       = local.project_name
   aws_region = local.region
 
+  vpc_cidr             = "10.0.0.0/16"
+  private_subnets_cidr = ["10.0.10.0/24", "10.0.11.0/24", "10.0.12.0/24"]
+  public_subnets_cidr  = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
+
   ec2_web_server_count = local.web_server_count
+  ec2_db_count         = local.db_count
 }
 
 
 module "ec2_web_server" {
   source = "./modules/EC2"
-
-  count = local.web_server_count
+  count  = local.web_server_count
 
   region = local.region
   name   = local.project_name
 
   private            = false
   subnet_id          = element(module.vpc.public_subnet_ids[*].id, count.index)
-  security_group_ids = [module.vpc.security_group_id]
-  ec2_public_key     = module.vpc.public_key_name
+  security_group_ids = [module.vpc.web_server_security_group_id]
+
+  ec2_public_key = module.vpc.public_key_name
 
   instance_spec = {
     type = local.ec2.instance_type
@@ -69,17 +74,34 @@ module "ec2_web_server" {
   depends_on = [module.vpc]
 }
 
+
+module "ec2_database" {
+  source = "./modules/EC2"
+  count  = local.db_count
+
+  region = local.region
+  name   = local.project_name
+
+  private = true
+
+  # subnet_id          = element(module.vpc.private_subnet_ids[*].id, count.index)
+  subnet_id          = element(module.vpc.public_subnet_ids[*].id, count.index)
+  security_group_ids = [module.vpc.database_security_group_id]
+
+  ec2_public_key = module.vpc.public_key_name
+
+  instance_spec = {
+    type = local.ec2.instance_type
+    ami  = local.ec2.ami
+  }
+
+  depends_on = [module.vpc]
+}
+
+
 # Export public IPs of EC2 instances.
 # Needed for Ansible playbook.
 resource "local_file" "ec2_public_ips" {
-  # file structure
-  # [webserver]
-  # ip.address.of.instance
-  # ip.address.of.instance
-
-  # [database]
-  # ip.address.of.instance
-
   filename = "${path.root}/ansible/hosts.ini"
   content  = <<-EOF
 [webserver]
@@ -88,30 +110,13 @@ ${ec2.public_ips[0]}
 %{endfor~}
 
 [database]
+%{for ec2 in module.ec2_database[*]~}
+${ec2.public_ips[0]}
+%{endfor~}
 EOF
 
-  depends_on = [module.ec2_web_server]
+  depends_on = [
+    module.ec2_web_server,
+    module.ec2_database
+  ]
 }
-
-
-# module "ec2_database" {
-#   source = "./modules/EC2"
-#   count  = local.db_count
-
-#   region = local.region
-#   name   = local.project_name
-
-#   private = true
-
-#   subnet_id          = ""
-#   security_group_ids = [""]
-
-#   ec2_public_key = module.vpc.public_key_name
-
-#   instance_spec = {
-#     type = local.ec2.instance_type
-#     ami  = local.ec2.ami
-#   }
-
-#   depends_on = [module.vpc]
-# }
