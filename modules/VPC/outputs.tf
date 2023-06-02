@@ -5,22 +5,12 @@ output "vpc_id" {
 
 output "public_subnet_ids" {
   description = "The IDs of the public subnets in the VPC"
-  value       = [for id in aws_subnet.public : id]
-}
-
-output "private_subnet_ids" {
-  description = "The IDs of the private subnets in the VPC"
-  value       = [for id in aws_subnet.private : id]
+  value       = [for subnet in aws_subnet.public : subnet.id]
 }
 
 output "web_server_security_group_id" {
   description = "The ID of the security group the web servers should be associated with"
   value       = aws_security_group.web_server.id
-}
-
-output "database_security_group_id" {
-  description = "The ID of the security group the DB should be associated with"
-  value       = aws_security_group.db.id
 }
 
 output "public_key" {

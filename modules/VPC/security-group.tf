@@ -31,18 +31,6 @@ locals {
     }
   ]
 
-  ingress_rules_db = [
-    {
-      name        = "MySQL default port"
-      port        = 3306
-      description = "Ingress rules for port 3306"
-    },
-    {
-      name        = "SSH"
-      port        = 22
-      description = "Ingress rules for port 22"
-    }
-  ]
 }
 
 resource "aws_security_group" "web_server" {
@@ -68,32 +56,6 @@ resource "aws_security_group" "web_server" {
   tags = {
     "Name"     = "sg-group-web-${var.name}"
     "Inbound"  = "HTTP, HTTPS, SSH"
-    "Outbound" = "All"
-  }
-}
-
-resource "aws_security_group" "db" {
-  name        = "db-${var.name}-sg"
-  description = "Allow inbound traffic to port 3306 and 22"
-
-  vpc_id = aws_vpc.vpc.id
-
-  egress = local.egress
-  dynamic "ingress" {
-    for_each = local.ingress_rules_db
-
-    content {
-      description = ingress.value.description
-      from_port   = ingress.value.port
-      to_port     = ingress.value.port
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
-
-  tags = {
-    "Name"     = "sg-group-db-${var.name}"
-    "Inbound"  = "Port 3306, SSH"
     "Outbound" = "All"
   }
 }

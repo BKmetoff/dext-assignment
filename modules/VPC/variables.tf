@@ -18,16 +18,6 @@ variable "ec2_web_server_count" {
   type        = number
 }
 
-variable "ec2_db_count" {
-  description = "How many database instances are to be provisioned"
-  type        = number
-}
-
-variable "private_subnets_cidr" {
-  description = "CIDR blocks for private subnets"
-  type        = list(string)
-}
-
 variable "public_subnets_cidr" {
   description = "CIDR blocks for public subnets"
   type        = list(string)
