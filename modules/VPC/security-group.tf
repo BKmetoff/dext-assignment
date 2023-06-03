@@ -13,6 +13,9 @@ locals {
     }
   ]
 
+  # Expose ports 80 and 81 to allow incoming traffic
+  # to both 'wordpress' replicas started by docker-compose.
+  # See ../../ansible/docker-compose.yaml
   ingress_rules_web_server = [
     {
       name        = "HTTPS"
@@ -25,12 +28,16 @@ locals {
       description = "Ingress rules for port 80"
     },
     {
+      name        = "HTTP"
+      port        = 81
+      description = "Ingress rules for port 81"
+    },
+    {
       name        = "SSH"
       port        = 22
       description = "Ingress rules for port 22"
     }
   ]
-
 }
 
 resource "aws_security_group" "web_server" {
