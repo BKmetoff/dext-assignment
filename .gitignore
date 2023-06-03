@@ -24,3 +24,6 @@ id_rsa*
 .env.local
 ec2_web_server_public_ips.yaml
 .DS_Store
+LoadBalancer
+db-container-logs
+entrypoint.sh
