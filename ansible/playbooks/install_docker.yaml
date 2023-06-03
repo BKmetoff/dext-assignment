@@ -1,0 +1,43 @@
+# Ansible playbook: Install & start Docker
+---
+- name: "Install & start Docker"
+  hosts: all
+  become: true
+  vars:
+    EC2_USER: "{{ lookup('env', 'EC2_USER') }}"
+  tasks:
+    - name: register status of /usr/bin/docker-compose
+      stat:
+        path: /usr/bin/docker-compose
+      register: docker_compose_path
+
+    - name: Check if 'docker-compose' is added to PATH
+      when: "not docker_compose_path.stat.exists"
+      block:
+        - name: Add 'docker-compose' to PATH
+          become: true
+          ansible.builtin.shell: sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+    - name: Copy docker-compose file
+      become: true
+      ansible.builtin.copy:
+        src: ../../docker/docker-compose.yaml # use env var
+        dest: /home/ec2-user/docker-compose.yaml
+        owner: "{{ lookup('env', 'EC2_USER') }}"
+        group: "{{ lookup('env', 'EC2_USER') }}"
+        mode: "0644"
+
+    - name: Copy .env file
+      become: true
+      ansible.builtin.copy:
+        src: ../../.env
+        dest: /home/ec2-user/.env
+        owner: "{{ lookup('env', 'EC2_USER') }}"
+        group: "{{ lookup('env', 'EC2_USER') }}"
+        mode: "0644"
+
+    - name: Standup server and db services
+      become: true
+      shell: "docker-compose --env-file ./.env up -d"
+
+    ## seeding in ./seed_db.yaml

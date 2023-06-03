@@ -1,0 +1,20 @@
+# Ansible playbook: Seed MySQL database
+---
+- name: "Seed MySQL database"
+  hosts: all
+  become: true
+  tasks:
+    - name: Copy seed.sql
+      become: true
+      ansible.builtin.copy:
+        src: ../../mysql_db_backup/seed.sql
+        dest: /home/ec2-user/seed.sql
+        owner: ec2-user # use env var
+        group: ec2-user # use env var
+        mode: "0644"
+
+      # exec into the DB container.
+      # get the container name using
+      # docker ps -aqf "name=db"
+    - name: Seed DB
+      shell: sudo docker exec -i "$(sudo docker ps -aqf 'name=db')" sh -c 'exec mysql -uroot -p"$(echo $MYSQL_ROOT_PASSWORD)"' < ./seed.sql
