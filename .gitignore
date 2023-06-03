@@ -14,16 +14,15 @@ workspace
 # Crash log files
 crash.log
 
-# Ignore IDE files
+# IDE files
 .vs-code
 
-# Ignore ssh keys
+# ssh keys
 id_rsa*
+
+# Ansible hosts file
+hosts.ini
 
 # Misc
 .env.local
-ec2_web_server_public_ips.yaml
 .DS_Store
-LoadBalancer
-db-container-logs
-entrypoint.sh
