@@ -15,7 +15,7 @@ locals {
 
   # Expose ports 80 and 81 to allow incoming traffic
   # to both 'wordpress' replicas started by docker-compose.
-  # See ../../ansible/docker-compose.yaml
+  # See /docker/docker-compose.yaml
   ingress_rules_web_server = [
     {
       name        = "HTTPS"
