@@ -26,3 +26,4 @@ hosts.ini
 # Misc
 .env.local
 .DS_Store
+DB_size.log
