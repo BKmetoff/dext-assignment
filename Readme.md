@@ -37,10 +37,17 @@ This repository contains Infrastructure as Code (IaC) and tools to assist in the
 ## Workflow:
 
 0. Clone this repo & cd into it
-1. Generate a pair of SSH keys using `ssh-keygen` and place them in `[repo]/ssh`
-2. Run `terraform init`
-3. Run `./entrypoint.sh`
-4. _(optional)_ Copy the IP address from the terminal and open it in your browser.
+1. Generate a pair of SSH keys using `ssh-keygen` and place them in `[path/to/repo]/ssh`
+2. Create an AWS S3 bucket that's going to be used for storing the Terraform state
+3. Fill the following:
+
+   - the environment variables in the `[path/to/repo].env` file
+   - the AWS profile and region in the [`locals` block in `[path/to/repo]/main.tf`](https://github.com/BKmetoff/dext-assignment/blob/master/main.tf#L1)
+   - the bucket name and the AWS region in the [terraform backend block in `[path/to/repo]/main.tf`](https://github.com/BKmetoff/dext-assignment/blob/4ef350a1cd0a8ad5669963630eac76aedda86c05/main.tf#L29)
+
+4. Run `terraform init`
+5. Run `./entrypoint.sh`
+6. _(optional)_ Copy the IP address from the terminal and open it in your browser.
 
 # Repo structure & concept:
 
