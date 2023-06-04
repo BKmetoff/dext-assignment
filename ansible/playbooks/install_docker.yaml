@@ -3,8 +3,6 @@
 - name: "Install & start Docker"
   hosts: all
   become: true
-  vars:
-    EC2_USER: "{{ lookup('env', 'EC2_USER') }}"
   tasks:
     - name: register status of /usr/bin/docker-compose
       stat:
@@ -21,10 +19,10 @@
     - name: Copy docker-compose file
       become: true
       ansible.builtin.copy:
-        src: ../../docker/docker-compose.yaml # use env var
+        src: ../../docker/docker-compose.yaml
         dest: /home/ec2-user/docker-compose.yaml
-        owner: "{{ lookup('env', 'EC2_USER') }}"
-        group: "{{ lookup('env', 'EC2_USER') }}"
+        owner: ec2-user
+        group: ec2-user
         mode: "0644"
 
     - name: Copy .env file
@@ -32,8 +30,8 @@
       ansible.builtin.copy:
         src: ../../.env
         dest: /home/ec2-user/.env
-        owner: "{{ lookup('env', 'EC2_USER') }}"
-        group: "{{ lookup('env', 'EC2_USER') }}"
+        owner: ec2-user
+        group: ec2-user
         mode: "0644"
 
     - name: Standup server and db services

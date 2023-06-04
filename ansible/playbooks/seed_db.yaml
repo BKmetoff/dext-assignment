@@ -9,12 +9,23 @@
       ansible.builtin.copy:
         src: ../../mysql_db_backup/seed.sql
         dest: /home/ec2-user/seed.sql
-        owner: ec2-user # use env var
-        group: ec2-user # use env var
+        owner: ec2-user
+        group: ec2-user
         mode: "0644"
 
-      # exec into the DB container.
-      # get the container name using
-      # docker ps -aqf "name=db"
+    # MYSQL_ROOT_PASSWORD should be on
+    # the last row of the '.env' file
+    # so that it can get extracted
+    # in the 'Seed DB' step
+    - command: "cat ./.env"
+      register: content
+
+    - name: Pause
+      ansible.builtin.pause:
+        seconds: 10
+
+    # exec into the DB container.
+    # get the container name using
+    # docker ps -aqf "name=db"
     - name: Seed DB
-      shell: sudo docker exec -i "$(sudo docker ps -aqf 'name=db')" sh -c 'exec mysql -uroot -p"$(echo $MYSQL_ROOT_PASSWORD)"' < ./seed.sql
+      shell: sudo docker exec -i "$(sudo docker ps -aqf 'name=db')" sh -c 'exec mysql -uroot -p"{{ content.stdout.split('\n')[-1].split('=')[-1] }}"' < ./seed.sql
