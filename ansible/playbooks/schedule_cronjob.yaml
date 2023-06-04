@@ -1,0 +1,43 @@
+# Ansible playbook: Install & start Docker
+---
+- name: "Schedule a cronjob to pull the size of the database and save it in a local file"
+  hosts: all
+  become: true
+  tasks:
+    - name: Copy bin script
+      become: true
+      ansible.builtin.copy:
+        src: ../../bin/export_db_size.sh
+        dest: /home/ec2-user/export_db_size.sh
+        owner: ec2-user
+        group: ec2-user
+        mode: "0644"
+
+    - name: Make script executable
+      become: true
+      shell: chmod +x /home/ec2-user/export_db_size.sh
+
+    # Uncomment for a one-off export
+    # - name: Export DB size
+    #   become: true
+    #   shell: echo "$(/home/ec2-user/export_db_size.sh)"
+
+    - name: "Schedule cronjob"
+      ansible.builtin.cron:
+        name: "Export DB Size"
+        state: present
+        # Un-comment to test the cronjob.
+        # The below will schedule it
+        # to run every  minute.
+        # minute: "*"
+        # hour: "*"
+        # day: "*"
+        # month: "*"
+        # weekday: "*"
+        minute: "20"
+        hour: "4"
+        day: "*"
+        month: "*"
+        weekday: "0"
+        user: ec2-user
+        job: "/bin/sh /home/ec2-user/export_db_size.sh"
